@@ -1,6 +1,6 @@
 <?php
     const DB_SERVER = "LOCALHOST";
-    const DB_USERNAME = "root";
+    const DB_USERNAME = "db_root";
     const DB_PASSWORD = "ROOT8594";
     const DB_NAME = "master_quiz";
 

@@ -27,6 +27,28 @@
 
         else {
             $sql = "SELECT username FROM users WHERE username = :username";
+
+            if ($stmt = $database->prepare($sql)) {
+                $stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
+                $param_username = trim($_POST["username"]);
+               if ($stmt->execute()) {
+                   if ($stmt->rowCount() === 1) {
+                       $username_error = "Username is already taken";
+                   }
+                   else {
+                       $param_username = trim($_POST["username"]);
+                   }
+               }
+               else {
+                   echo "Something went wrong";
+               }
+            }
+
+            else {
+                echo "Something went wrong";
+            }
+
+            unset($stmt);
         }
 
 
@@ -51,6 +73,24 @@
                 $confirmed_password_error = "Passwords do not match";
             }
         }
+
+        if (empty($username_error) && empty($password_error) && empty($confirmed_password_error)) {
+            $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
+            if ($stmt = $database->prepare($sql)) {
+                $stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
+                $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
+
+                $param_username = trim($_POST["username"]);
+                $param_password = trim($_POST["password"]);
+
+                if ($stmt->execute()) {
+                    header("location: pages/login.php");
+                }
+                else {
+
+                }
+            }
+        }
     }
 ?>
 
@@ -72,7 +112,7 @@
         <p>Fill out the form to register for an account!</p>
         <form action="<?php htmlspecialchars($_SERVER["PHP_SELF"])?>" method="post">
             <div class="form-group">
-                <label for="username">Username</label>
+                <label>Username</label>
                 <input type="text" name="username" placeholder="Enter a username" class="form-control" <?php echo (!empty($username_error)) ? 'is-invalid' : '';?> value= "<?= $username?>">
                 <span class="invalid-feedback">
                     <?php echo $username_error; ?>
@@ -80,14 +120,14 @@
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
+                <label>Password</label>
                 <input type="password" name="password" placeholder="Enter a password" class="form-control" <?php echo (!empty($password_error)) ? 'is-invalid' : '';?> value= "<?= $password?>">
                 <span class="invalid-feedback">
                     <?php echo $password_error; ?>
                 </span>
             </div>
             <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
+                <label>Confirm Password</label>
                 <input type="password" name="confirm_password" placeholder="Enter a password" class="form-control" <?php echo (!empty($confirmed_password_error)) ? 'is-invalid' : '';?> value= "<?= $confirmed_password?>">
                 <span class="invalid-feedback">
                     <?php echo $confirmed_password_error; ?>
